@@ -67,7 +67,7 @@
     }
 
     .td-measure-grid input.invalid{ background:#ffebee; box-shadow:inset 0 0 0 1px #d32f2f; }
-    @media print{ .td-measure-grid input.invalid{ background:transparent !important; box-shadow:none !important; } }
+    @media print{ .td-measure-grid input.invalid{ background:transparent !重要; box-shadow:none !重要; } }
 
     .serial-wrap{ display:grid; grid-template-columns:auto 1fr; align-items:center; gap:1mm; }
     .serial-prefix{ white-space:nowrap; }
@@ -106,7 +106,8 @@
           <td>TTS60-01-690</td>
           <td class="section-label">発行年月日</td>
           <td>
-            <input type="date" name="hakkohiduke" class="no-print soft-required" data-soft-required="1" />
+            <!-- TEXT with YYYY/MM/DD (auto) -->
+            <input type="text" name="hakkohiduke" placeholder="YYYY/MM/DD" class="no-print soft-required" data-soft-required="1" />
             <span class="print-text" data-from="hakkohiduke"></span>
           </td>
         </tr>
@@ -234,18 +235,20 @@
 
   <script>
     /* ==== CONFIG ==== */
-    const APP_NS  = '330580v'; // unik per form (queue sendiri)
+    const APP_NS  = '330580v'; // unik per form
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbxWxAa_dWQNoUPhWnkw3P22jgeW4vb44Z5ISuUyUWsAAroFzzE6iIVWMIpqqio6E5OgqA/exec';
     const getSerialPrefix = () => document.querySelector('.serial-prefix')?.textContent?.trim() || 'XR3305-';
     const serverPrefix = () => `${APP_NS}::${getSerialPrefix()}`;
     const SERIAL_SCOPE = () => `okuma:serial:${APP_NS}:${getSerialPrefix()}`;
 
     /* ==== STATE ==== */
-    let PAD_DIGITS = 4; // bisa diubah (#️⃣)
+    let PAD_DIGITS = 4;
     const LOCK_TTL_SEC = 120; let __lockId=null; let __lockTimer=null;
 
+    /* ==== STAMP ==== */
     function updateStampPreview(id, src){ document.getElementById(id).src = src || ''; }
 
+    /* ==== CLEAR ==== */
     function clearAllFields(){
       const form=document.getElementById('inspection-form');
       form.reset();
@@ -253,8 +256,8 @@
       form.querySelectorAll('.td-measure-grid input.invalid').forEach(el=>el.classList.remove('invalid'));
       wireDateMirror(); wireEnterNavigationAll(); wireSerialMirror();
       wireSoftRequired(); markSoftRequired();
-      setTodayIfEmpty('hakkohiduke');
-      setDefaultJudges(); updateOverallJudgment();
+      setIssuedTodayIfEmpty(); wireHakkohidukeText(); // issued date text
+      updateOverallJudgment();
     }
 
     /* ==== VALIDASI MEASURE ==== */
@@ -269,7 +272,7 @@
           if((v.match(/\./g)||[]).length>1){ const[h,...r]=v.split('.'); v=h+'.'+r.join('').replace(/\D/g,''); }
           if(v.includes('.')){ let[d='',f='']=v.split('.'); d=d.slice(0,MAX_INT_DIGITS); v = allowDec ? (f===''?`${d}.`:`${d}.${(f||'').replace(/\D/g,'').slice(0,1)}`) : d; }
           else v=v.slice(0,MAX_INT_DIGITS);
-          inp.value=v; inp.classList.remove('invalid');
+          inp.value=v; inp.classList.remove('invalid'); markSoftRequired();
         });
         inp.addEventListener('blur',()=>{
           let v=normalize(inp.value);
@@ -281,7 +284,6 @@
           inp.value = allowDec ? n.toFixed(1).replace(/\.0$/,'.0') : String(Math.trunc(n)).slice(0,MAX_INT_DIGITS);
           inp.classList.remove('invalid'); markSoftRequired();
         });
-        inp.addEventListener('input', markSoftRequired);
       });
     })();
 
@@ -296,22 +298,43 @@
       });
     }
 
-    /* ==== MIRROR TANGGAL & 判定 ==== */
+    /* ==== MIRROR TANGGAL ==== */
     function wireDateMirror(){
       document.querySelectorAll('input[type="date"]').forEach(inp=>{
         const span=document.querySelector(`.print-text[data-from="${inp.name}"]`); if(!span) return;
-        const fmt=v=>v?v.replace(/(\d{4})-(\d{2})-(\d{2})/,'$1/$2/$3'):''; const upd=()=>span.textContent=fmt(inp.value);
+        const fmt=v=>v?v.replace(/(\d{4})-(\d{2})-(\d{2})/,'$1/$2/$3'):'';
+        const upd=()=>span.textContent=fmt(inp.value);
         inp.addEventListener('change',()=>{ upd(); markSoftRequired(); }); upd();
       });
     }
-    function wireJudgeMirror(){
-      document.querySelectorAll('select.judge-select').forEach(sel=>{
-        if(!sel.nextElementSibling || !sel.nextElementSibling.classList.contains('print-text')){
-          const span=document.createElement('span'); span.className='print-text'; sel.parentNode.insertBefore(span, sel.nextSibling);
-        }
-        const span=sel.nextElementSibling; const upd=()=>{ span.textContent=sel.value; markSoftRequired(); updateOverallJudgment(); };
-        sel.addEventListener('change',upd); upd();
-      });
+
+    /* ==== 発行年月日: TEXT YYYY/MM/DD ==== */
+    function formatYMD(d){ const yyyy=d.getFullYear(), mm=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0'); return `${yyyy}/${mm}/${dd}`; }
+    function validYMDText(s){
+      const m=/^\s*(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})\s*$/.exec(s||''); if(!m) return null;
+      const y=+m[1], mo=+m[2], d=+m[3]; if(mo<1||mo>12||d<1||d>31) return null;
+      return `${String(y).padStart(4,'0')}/${String(mo).padStart(2,'0')}/${String(d).padStart(2,'0')}`;
+    }
+    function wireHakkohidukeText(){
+      const inp=document.querySelector('input[name="hakkohiduke"]');
+      const span=document.querySelector('.print-text[data-from="hakkohiduke"]');
+      if(!inp) return;
+      const sync=()=>{
+        const norm=validYMDText(inp.value);
+        if(norm && inp.value!==norm) inp.value=norm;
+        if(span) span.textContent = inp.value || '';
+        markSoftRequired();
+      };
+      inp.addEventListener('blur', sync);
+      inp.addEventListener('input', ()=>{ if(span) span.textContent = inp.value; markSoftRequired(); });
+      sync();
+    }
+    function setIssuedTodayIfEmpty(){
+      const inp=document.querySelector('input[name="hakkohiduke"]');
+      if(!inp) return;
+      if(!inp.value){ inp.value = formatYMD(new Date()); }
+      const span=document.querySelector('.print-text[data-from="hakkohiduke"]');
+      if(span) span.textContent = inp.value;
     }
 
     /* ==== SOFT REQUIRED ==== */
@@ -397,7 +420,7 @@
     async function printViaPDF(){ const ok=await ensureHasLockOrAcquire(); if(!ok){ alert('現在ほかの端末が使用中のため、印刷できません。'); return; } await assignNextSerialSuffix(); const doc=await buildPdfDoc(); if(doc.autoPrint) doc.autoPrint(); const blobUrl=doc.output('bloburl'); window.open(blobUrl,'_blank'); }
 
     /* ==== Save to NAS (duplikat guard by 製造No) ==== */
-    const DB_NAME='form-folder-db', STORE='folders'; let __db; const FIXED_KEY='Okuma_MB-80V';
+    const DB_NAME='form-folder-db', STORE='folders'; let __db; const FIXED_KEY='Okuma_MB80V';
     function openDB(){ return new Promise((resolve,reject)=>{ const req=indexedDB.open(DB_NAME,1); req.onupgradeneeded=()=>req.result.createObjectStore(STORE); req.onsuccess=()=>{ __db=req.result; resolve(); }; req.onerror=()=>reject(req.error); }); }
     async function openDBIfNeeded(){ if(!__db) await openDB(); }
     async function putHandle(key,handle){ await openDBIfNeeded(); return new Promise((res,rej)=>{ const tx=__db.transaction(STORE,'readwrite'); tx.objectStore(STORE).put(handle,key); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); }); }
@@ -444,21 +467,43 @@
       }
     }
 
-    /* ==== Helpers ==== */
-    function setTodayIfEmpty(name){
-      const inp=document.querySelector(`input[name="${name}"]`); if(!inp) return;
-      if(!inp.value){ const t=new Date(); const yyyy=t.getFullYear(); const mm=String(t.getMonth()+1).padStart(2,'0'); const dd=String(t.getDate()).padStart(2,'0'); inp.value=`${yyyy}-${mm}-${dd}`; inp.dispatchEvent(new Event('change',{bubbles:true})); }
-    }
-
-    /* ==== 総合判定（1:合,2:合,3:無,4:合,5:合,6:合,7:合）==== */
+    /* ==== 総合判定（判定+測定値）==== */
     function isOverallPass(){
-      const v1=v('judge1'), v2=v('judge2'), v3=v('judge3'), v4=v('judge4'), v5=v('judge5'), v6=v('judge6'), v7=v('judge7');
-      if(!v1||!v2||!v3||!v4||!v5||!v6||!v7) return false;
-      return (v1==='合')&&(v2==='合')&&(v3==='無')&&(v4==='合')&&(v5==='合')&&(v6==='合')&&(v7==='合');
-      function v(n){ return document.querySelector(`select[name="${n}"]`)?.value || ''; }
+      // 判定: 1,2,4,5,6,7 = 合 ; 3 = 無
+      const v = n => document.querySelector(`select[name="${n}"]`)?.value || '';
+      const j = [v('judge1'),v('judge2'),v('judge3'),v('judge4'),v('judge5'),v('judge6'),v('judge7')];
+      if(j.some(x=>!x)) return null;
+      const okJudge = (j[0]==='合')&&(j[1]==='合')&&(j[2]==='無')&&(j[3]==='合')&&(j[4]==='合')&&(j[5]==='合')&&(j[6]==='合');
+      if(!okJudge) return false;
+
+      // 測定値: a<=365, b>=2009, c>=1630, resist<=7.0
+      const ranges = [
+        {name:"a_length",min:0,max:365},
+        {name:"b_length",min:2009},
+        {name:"c_length",min:1630},
+        {name:"start_resist",min:0,max:7},
+        {name:"mid_resist",min:0,max:7},
+        {name:"end_resist",min:0,max:7},
+      ];
+      for(const r of ranges){
+        const el=document.querySelector(`input[name="${r.name}"]`);
+        if(!el || !el.value) return null;
+        const val=parseFloat(el.value);
+        if(Number.isNaN(val)) return false;
+        if(r.min!==undefined && val<r.min) return false;
+        if(r.max!==undefined && val>r.max) return false;
+      }
+      return true;
     }
-    function updateOverallJudgment(){ const sel=document.querySelector('select[name="final_judgment"]'); const span=sel.nextElementSibling?.classList.contains('print-text')?sel.nextElementSibling:null; sel.value=isOverallPass()?'合格':'否'; if(span) span.textContent=sel.value; }
-    function setDefaultJudges(){ const m=(n,val)=>{ const s=document.querySelector(`select[name="${n}"]`); if(s && !s.value){ s.value=val; s.dispatchEvent(new Event('change',{bubbles:true})); } }; m('judge1','合'); m('judge2','合'); m('judge3','無'); m('judge4','合'); m('judge5','合'); m('judge6','合'); m('judge7','合'); }
+    function updateOverallJudgment(){
+      const sel=document.querySelector('select[name="final_judgment"]');
+      const span=sel.nextElementSibling;
+      const res=isOverallPass();
+      if(res===true) sel.value='合格';
+      else if(res===false) sel.value='否';
+      else sel.value='';
+      if(span) span.textContent=sel.value;
+    }
 
     /* ==== UI: set next & digits ==== */
     async function configureNextSerial(){
@@ -482,15 +527,20 @@
 
     /* ==== INIT ==== */
     window.addEventListener('load', async ()=>{
-      wireJudgeMirror(); wireDateMirror(); wireEnterNavigationAll(); wireSerialMirror();
+      wireJudgeMirror(); wireDateMirror(); wireHakkohidukeText(); wireEnterNavigationAll(); wireSerialMirror();
       wireSoftRequired(); markSoftRequired();
-      setTodayIfEmpty('hakkohiduke');
-      setDefaultJudges(); updateOverallJudgment();
+      setIssuedTodayIfEmpty();
+      updateOverallJudgment();
 
+      // digits dari server (jika ada)
       try{ const info=await getInfoShared(serverPrefix()); if(typeof info?.digits==='number' && info.digits>=1) PAD_DIGITS=info.digits; }catch(e){}
       await ensureHasLockOrAcquire();
 
-      document.querySelectorAll('select.judge-select').forEach(sel=> sel.addEventListener('change', updateOverallJudgment));
+      // reevaluate 総合判定 saat ada perubahan
+      document.querySelectorAll('select.judge-select, .td-measure-grid input').forEach(el=>{
+        el.addEventListener('change', updateOverallJudgment);
+        el.addEventListener('input',  updateOverallJudgment);
+      });
     });
     window.addEventListener('beforeunload', releaseSharedLock);
   </script>
