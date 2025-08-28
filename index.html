@@ -12,7 +12,10 @@
     input,select{font-size:3.2mm; padding:.5mm; box-sizing:border-box; font-family:inherit;}
     input[type="date"]{-webkit-appearance:none; appearance:none; line-height:1.2;}
 
-    table input,table input[type="date"],.td-measure-grid input{
+    /* tabel inputs default transparan */
+    table input,
+    table input[type="date"],
+    .td-measure-grid input{
       border:none; outline:none; background:transparent; box-shadow:none; border-radius:0;
       padding:0 1mm; width:100%; height:100%; box-sizing:border-box; -webkit-appearance:none; appearance:none;
     }
@@ -67,12 +70,17 @@
     }
 
     .td-measure-grid input.invalid{ background:#ffebee; box-shadow:inset 0 0 0 1px #d32f2f; }
-    @media print{ .td-measure-grid input.invalid{ background:transparent !重要; box-shadow:none !重要; } }
+    @media print{ .td-measure-grid input.invalid{ background:transparent !important; box-shadow:none !important; } }
 
     .serial-wrap{ display:grid; grid-template-columns:auto 1fr; align-items:center; gap:1mm; }
     .serial-prefix{ white-space:nowrap; }
 
-    .soft-required.pending{ background-color:#fff6d8; box-shadow:inset 0 0 0 1px rgba(242,201,76,.25); transition:background-color .25s ease; }
+    /* Soft required highlight — pakai !important agar tidak ketimpa rule input tabel */
+    .soft-required.pending{
+      background-color:#fff6d8 !important;
+      box-shadow:inset 0 0 0 1px rgba(242,201,76,.25) !important;
+      transition:background-color .25s ease;
+    }
     @media print{ .soft-required.pending{ background:transparent !important; box-shadow:none !important; } }
 
     #lock-overlay{position:fixed;inset:0;background:rgba(255,255,255,.92);display:none;align-items:center;justify-content:center;z-index:9998;text-align:center;padding:20mm;}
@@ -106,7 +114,7 @@
           <td>TTS60-01-690</td>
           <td class="section-label">発行年月日</td>
           <td>
-            <!-- TEXT with YYYY/MM/DD (auto) -->
+            <!-- teks YYYY/MM/DD + mirror -->
             <input type="text" name="hakkohiduke" placeholder="YYYY/MM/DD" class="no-print soft-required" data-soft-required="1" />
             <span class="print-text" data-from="hakkohiduke"></span>
           </td>
@@ -256,7 +264,7 @@
       form.querySelectorAll('.td-measure-grid input.invalid').forEach(el=>el.classList.remove('invalid'));
       wireDateMirror(); wireEnterNavigationAll(); wireSerialMirror();
       wireSoftRequired(); markSoftRequired();
-      setIssuedTodayIfEmpty(); wireHakkohidukeText(); // issued date text
+      setIssuedTodayIfEmpty(); wireHakkohidukeText();
       updateOverallJudgment();
     }
 
@@ -326,7 +334,7 @@
         markSoftRequired();
       };
       inp.addEventListener('blur', sync);
-      inp.addEventListener('input', ()=>{ if(span) span.textContent = inp.value; markSoftRequired(); });
+      inp.addEventListener('input', ()=>{ if(span) span.textContent=inp.value; markSoftRequired(); });
       sync();
     }
     function setIssuedTodayIfEmpty(){
@@ -472,7 +480,8 @@
       // 判定: 1,2,4,5,6,7 = 合 ; 3 = 無
       const v = n => document.querySelector(`select[name="${n}"]`)?.value || '';
       const j = [v('judge1'),v('judge2'),v('judge3'),v('judge4'),v('judge5'),v('judge6'),v('judge7')];
-      if(j.some(x=>!x)) return null;
+      if(j.some(x=>!x)) return null; // ada yang belum diisi
+
       const okJudge = (j[0]==='合')&&(j[1]==='合')&&(j[2]==='無')&&(j[3]==='合')&&(j[4]==='合')&&(j[5]==='合')&&(j[6]==='合');
       if(!okJudge) return false;
 
@@ -487,7 +496,7 @@
       ];
       for(const r of ranges){
         const el=document.querySelector(`input[name="${r.name}"]`);
-        if(!el || !el.value) return null;
+        if(!el || !el.value) return null; // belum diisi -> kosongkan hasil
         const val=parseFloat(el.value);
         if(Number.isNaN(val)) return false;
         if(r.min!==undefined && val<r.min) return false;
@@ -501,7 +510,7 @@
       const res=isOverallPass();
       if(res===true) sel.value='合格';
       else if(res===false) sel.value='否';
-      else sel.value='';
+      else sel.value=''; // kosong
       if(span) span.textContent=sel.value;
     }
 
@@ -527,16 +536,16 @@
 
     /* ==== INIT ==== */
     window.addEventListener('load', async ()=>{
-      wireJudgeMirror(); wireDateMirror(); wireHakkohidukeText(); wireEnterNavigationAll(); wireSerialMirror();
+      wireDateMirror(); wireHakkohidukeText(); wireEnterNavigationAll(); wireSerialMirror();
       wireSoftRequired(); markSoftRequired();
       setIssuedTodayIfEmpty();
       updateOverallJudgment();
 
-      // digits dari server (jika ada)
+      // digits dari server (kalau ada)
       try{ const info=await getInfoShared(serverPrefix()); if(typeof info?.digits==='number' && info.digits>=1) PAD_DIGITS=info.digits; }catch(e){}
       await ensureHasLockOrAcquire();
 
-      // reevaluate 総合判定 saat ada perubahan
+      // evaluasi otomatis saat ada perubahan
       document.querySelectorAll('select.judge-select, .td-measure-grid input').forEach(el=>{
         el.addEventListener('change', updateOverallJudgment);
         el.addEventListener('input',  updateOverallJudgment);
