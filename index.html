@@ -358,8 +358,11 @@
       const upd = () => { out.textContent = getSerialFull(); };
       inp?.addEventListener('input', upd); upd();
     }
-    function computePrefixFromZuban(z){ const digits=String(z||'').replace(/[^0-9]/g,''); return digits ? `XR${digits}-` : 'XR-'; }
-    function applyPrefix(){ const z = getZuban(); const pref = computePrefixFromZuban(z); const span = document.querySelector('.serial-prefix'); if(span) span.textContent = pref; }
+   function computePrefixFromZuban(z){
+  const d = String(z||'').replace(/\D/g,'').slice(0,4); // 4 digit pertama
+  return d ? `XR${d}-` : 'XR-';
+}
+ function applyPrefix(){ const z = getZuban(); const pref = computePrefixFromZuban(z); const span = document.querySelector('.serial-prefix'); if(span) span.textContent = pref; }
 
     // ====== SHARED COUNTER (GAS) ======
     async function apiGAS(body){
@@ -550,4 +553,5 @@
   </script>
 </body>
 </html>
+
 
