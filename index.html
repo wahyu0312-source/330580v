@@ -2,88 +2,93 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>出荷検査成績書 オークマ専用 MB-80V（右）</title>
+  <title>出荷検査成績書 3305 MB-80V</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <style>
-    html, body { background:#e7e7e7; margin:0; padding:0; font-family:"Yu Gothic UI",Meiryo,Arial,sans-serif; font-size:3.5mm; height:100%; }
-    .no-print{display:initial;} .print-text{display:none;}
-    input,select{font-size:3.2mm; padding:.5mm; box-sizing:border-box; font-family:inherit;}
-    input[type="date"]{-webkit-appearance:none; appearance:none; line-height:1.2;}
+    html, body { background:#e7e7e7; margin:0; padding:0; font-family:Arial,sans-serif; font-size:3.5mm; height:100%; }
+    .no-print { display: initial; } .print-text { display: none; }
+    input, select { font-size:3.2mm; padding:.5mm; box-sizing:border-box; font-family:Arial,sans-serif; }
+    input[type="date"] { -webkit-appearance:none; appearance:none; line-height:1.2; }
+    table input, table input[type="date"], .td-measure-grid input {
+      border:none; outline:none; background:transparent; box-shadow:none; border-radius:0; padding:0 1mm;
+      width:100%; height:100%; box-sizing:border-box; -webkit-appearance:none; appearance:none;
+    }
+    table input:focus, table input[type="date"]:focus { outline:none; box-shadow:none; }
+    @media screen { html, body { display:flex; flex-direction:column; align-items:center; } .b5-preview { margin:12mm 0; } }
+    .b5-preview { background:#fff; width:176mm; max-width:98vw; margin:10mm auto; padding:8mm; box-shadow:0 0 5mm rgba(0,0,0,.25); box-sizing:border-box; }
+    h2 { text-align:center; font-size:7mm; margin-bottom:8mm; }
 
-    /* tabel inputs default transparan */
-    table input,
-    table input[type="date"],
-    .td-measure-grid input{
-      border:none; outline:none; background:transparent; box-shadow:none; border-radius:0;
-      padding:0 1mm; width:100%; height:100%; box-sizing:border-box; -webkit-appearance:none; appearance:none;
+    /* ===== table base ===== */
+    table { width:100%; border-collapse:collapse; margin-bottom:4mm; }
+    th, td { border:.3mm solid #333; padding:1.2mm 1mm; text-align:center; background:#fff; vertical-align:middle; }
+    /* header cells now also white (no gray) */
+    th { background:#fff; }
+    /* section label juga putih */
+    .section-label { text-align:left; font-weight:bold; background:#fff; }
+
+    .header-table td, .header-table th { white-space:nowrap; word-break:keep-all; }
+    .header-table input { min-width:0; }
+
+    /* util: paksa isi rata kiri di sel tertentu */
+    .ta-left { text-align:left !important; }
+
+    .td-measure { padding:0 !important; }
+    .td-measure-grid { display:grid; grid-template-columns:1fr auto; align-items:center; gap:1mm; }
+    .td-measure-grid input { text-align:right; }
+
+    .inputter-row { display:flex; align-items:center; gap:2mm; margin-bottom:3mm; }
+    .inputter-row label { width:12mm; font-weight:bold; }
+    .inputter-row select { width:30%; }
+
+    .stamp-box-row { display:flex; justify-content:flex-end; gap:4mm; margin-top:3mm; }
+    .stamp-box-row>div { display:flex; flex-direction:column; align-items:center; }
+    .stamp-label { font-size:3mm; margin-bottom:1mm; text-align:center; }
+    .signature-box {
+      width:15mm; height:15mm; border:.3mm solid #333; border-radius:2mm;
+      background:#fff; /* putihkan kotak stempel */
+      display:flex; align-items:center; justify-content:center; overflow:hidden;
+    }
+    .signature-box img { width:9mm; height:9mm; object-fit:contain; }
+
+    .company-name { text-align:right; margin:2mm 1mm 0; font-weight:bold; }
+    .order-no-row .section-label { width:15%; } .order-no-row .data { width:85%; }
+
+    .toolbar { position:fixed; top:12px; left:50%; transform:translateX(-50%); display:flex; gap:8px; padding:8px 10px; background:rgba(255,255,255,0.92); border:1px solid #ddd; border-radius:12px; box-shadow:0 2px 18px rgba(0,0,0,.12); z-index:9999; backdrop-filter:blur(4px); }
+    .toolbar button { font-family:Arial,sans-serif; font-size:14px; padding:8px 14px; border-radius:8px; border:1px solid #ccc; background:#fff; cursor:pointer; }
+    .toolbar button:hover { filter:brightness(.96); }
+
+    @media (max-width:560px){
+      .toolbar{ top:8px; gap:6px; padding:6px 8px; }
+      .toolbar button{ padding:6px 10px; font-size:13px; }
     }
 
-    @media screen{ html,body{display:flex; flex-direction:column; align-items:center;} .b5-preview{margin:12mm 0;} }
-    .b5-preview{ background:#fff; width:176mm; max-width:98vw; margin:10mm auto; padding:8mm; box-shadow:0 0 5mm rgba(0,0,0,.25); box-sizing:border-box; }
-
-    h2{ text-align:center; font-size:7mm; margin-bottom:8mm; }
-    table{ width:100%; border-collapse:collapse; margin-bottom:4mm; }
-    th,td{ border:.3mm solid #333; padding:1.2mm 1mm; text-align:center; background:#fff; vertical-align:middle; }
-    th{ background:#f0f0f0; }
-    .section-label{ text-align:left; font-weight:bold; background:#f9f9f9; }
-    .header-table td,.header-table th{ white-space:nowrap; word-break:keep-all; }
-    .header-table input{ min-width:0; }
-
-    .td-measure{ padding:0 !important; }
-    .td-measure-grid{ display:grid; grid-template-columns:1fr auto; align-items:center; gap:1mm; }
-    .td-measure-grid input{ text-align:right; }
-
-    .inputter-row{ display:flex; align-items:center; gap:2mm; margin-bottom:3mm; }
-    .inputter-row label{ width:12mm; font-weight:bold; }
-    .inputter-row select{ width:30%; }
-
-    .stamp-box-row{ display:flex; justify-content:flex-end; gap:4mm; margin-top:3mm; }
-    .stamp-box-row>div{ display:flex; flex-direction:column; align-items:center; }
-    .stamp-label{ font-size:3mm; margin-bottom:1mm; text-align:center; }
-    .signature-box{ width:15mm; height:15mm; border:.3mm solid #333; border-radius:2mm; background:#fafbfc; display:flex; align-items:center; justify-content:center; overflow:hidden; }
-    .signature-box img{ width:9mm; height:9mm; object-fit:contain; }
-
-    .company-name{ text-align:right; margin:2mm 1mm 0; font-weight:bold; }
-    .order-no-row .section-label{ width:15%; } .order-no-row .data{ width:85%; }
-
-    .toolbar{
-      position:fixed; top:12px; left:50%; transform:translateX(-50%);
-      display:flex; gap:8px; padding:8px 10px; background:rgba(255,255,255,0.92);
-      border:1px solid #ddd; border-radius:12px; box-shadow:0 2px 18px rgba(0,0,0,.12); z-index:9999; backdrop-filter:blur(4px);
-    }
-    .toolbar button{ font-family:inherit; font-size:14px; padding:8px 14px; border-radius:8px; border:1px solid #ccc; background:#fff; cursor:pointer; }
-    .toolbar button:hover{ filter:brightness(.96); }
-
-    @media print{
-      @page{ size:B5 portrait; margin:12mm; }
-      html,body{ background:none !important; margin:0 !important; padding:0 !important; }
-      .toolbar{ display:none !important; }
-      .b5-preview{ width:100%; margin:0; padding:0; box-shadow:none; box-sizing:border-box; transform:scale(0.97); transform-origin:top left; }
-      table{ width:100%; }
-      .no-print{ display:none !important; } .print-text{ display:inline !important; }
-      table input,table input[type="date"],.td-measure-grid input{ border:none !important; outline:none !important; background:transparent !important; box-shadow:none !important; border-radius:0 !important; }
-      .signature-box img[src=""]{ display:none !important; }
-      .stamp-box-row,.signature-box{ display:flex !important; }
-      *{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+    @media print {
+      @page { size:B5 portrait; margin:12mm; }
+      html, body { background:none !important; margin:0 !important; padding:0 !important; }
+      .toolbar { display:none !important; }
+      .b5-preview { width:100%; margin:0; padding:0; box-shadow:none; box-sizing:border-box; transform:scale(0.97); transform-origin:top left; }
+      table { width:100%; }
+      .no-print { display:none !important; }
+      .print-text { display:inline !important; }
+      table input, table input[type="date"], .td-measure-grid input {
+        border:none !important; outline:none !important; background:transparent !important; box-shadow:none !important; border-radius:0 !important;
+      }
+      .signature-box img[src=""] { display:none !important; }
+      .stamp-box-row, .signature-box { display:flex !important; }
+      * { -webkit-print-color-adjust:exact; print-color-adjust:exact; }
     }
 
-    .td-measure-grid input.invalid{ background:#ffebee; box-shadow:inset 0 0 0 1px #d32f2f; }
-    @media print{ .td-measure-grid input.invalid{ background:transparent !important; box-shadow:none !important; } }
+    .td-measure-grid input.invalid { background:#ffebee; box-shadow:inset 0 0 0 1px #d32f2f; }
+    @media print { .td-measure-grid input.invalid { background:transparent !important; box-shadow:none !important; } }
 
-    .serial-wrap{ display:grid; grid-template-columns:auto 1fr; align-items:center; gap:1mm; }
-    .serial-prefix{ white-space:nowrap; }
+    .serial-wrap { display:grid; grid-template-columns:auto 1fr; align-items:center; gap:1mm; }
+    .serial-prefix { white-space:nowrap; }
 
-    /* Soft required highlight — pakai !important agar tidak ketimpa rule input tabel */
-    .soft-required.pending{
-      background-color:#fff6d8 !important;
-      box-shadow:inset 0 0 0 1px rgba(242,201,76,.25) !important;
-      transition:background-color .25s ease;
-    }
-    @media print{ .soft-required.pending{ background:transparent !important; box-shadow:none !important; } }
-
-    #lock-overlay{position:fixed;inset:0;background:rgba(255,255,255,.92);display:none;align-items:center;justify-content:center;z-index:9998;text-align:center;padding:20mm;}
+    /* highlight soft-required tetap (untuk input guide saat layar) */
+    .soft-required.pending { background-color:#06e8f8; box-shadow:inset 0 0 0 1px rgba(242,201,76,.25); transition:background-color .25s ease; }
+    @media print { .soft-required.pending { background:transparent !important; box-shadow:none !important; } }
   </style>
 </head>
 <body>
@@ -95,13 +100,16 @@
     <button type="button" onclick="configureDigits()">#️⃣ 桁数設定</button>
   </div>
 
-  <div id="lock-overlay">
+  <!-- overlay lock -->
+  <div id="lock-overlay" style="position:fixed;inset:0;background:rgba(255,255,255,.9);display:none;align-items:center;justify-content:center;z-index:9998;text-align:center;padding:20mm;">
     <div style="max-width:120mm;line-height:1.6;font-size:4.5mm;color:#b91c1c;">
       <div style="font-weight:bold;font-size:5mm;margin-bottom:4mm;">このフォームは現在、他の端末で編集中です</div>
-      保存/印刷が終わるまでお待ちください。
+      別端末で保存/印刷が終わるまでお待ちください。<br/>
+      （管理者が必要ならロックを解除できます）
     </div>
   </div>
 
+  <!-- form utama -->
   <form id="inspection-form">
     <div class="b5-preview">
       <h2>出荷検査成績書</h2>
@@ -109,31 +117,43 @@
       <table class="header-table">
         <tr>
           <td class="section-label">客先</td>
-          <td style="width:25%;">オークマ株式会社 御中</td>
+          <td>オークマ株式会社 御中</td>
+
           <td class="section-label">管理No.</td>
-          <td>TTS60-01-690</td>
+          <td class="ta-left">TTS60-01-690</td>
+
           <td class="section-label">発行年月日</td>
-          <td>
-            <!-- teks YYYY/MM/DD + mirror -->
-            <input type="text" name="hakkohiduke" placeholder="YYYY/MM/DD" class="no-print soft-required" data-soft-required="1" />
+          <td class="ta-left">
+            <input type="date" name="hakkohiduke" class="no-print" />
             <span class="print-text" data-from="hakkohiduke"></span>
           </td>
         </tr>
+
         <tr>
-          <td class="section-label">機種</td><td>MB-80V</td>
+          <td class="section-label">機種</td>
+          <td class="ta-left">MB-80V</td>
+
           <td class="section-label">品番</td>
           <td>H1090-0055-19</td>
-          <td class="section-label">図番</td><td>3305-20</td>
-        </tr>
-        <tr>
-          <td class="section-label">品名</td><td>X軸(右側)SG</td>
-          <td class="section-label">製造日</td>
+
+          <td class="section-label">図番</td>
           <td>
+            <input type="text" name="zuban" value="3305-20" class="soft-required" data-soft-required="1" />
+          </td>
+        </tr>
+
+        <tr>
+          <td class="section-label">品名</td>
+          <td class="ta-left">X軸(右側)SG</td>
+
+          <td class="section-label">製造日</td>
+          <td class="ta-left">
             <input type="date" name="makingdate" class="no-print soft-required" data-soft-required="1" />
             <span class="print-text" data-from="makingdate"></span>
           </td>
+
           <td class="section-label">製造No</td>
-          <td>
+          <td class="ta-left">
             <div class="serial-wrap no-print">
               <span class="serial-prefix" data-prefix>XR3305-</span>
               <input type="text" name="serial_no_suffix" inputmode="numeric" placeholder="0001" class="soft-required" data-soft-required="1" readonly />
@@ -141,13 +161,13 @@
             <span class="print-text" data-serial-print></span>
           </td>
         </tr>
+
         <tr class="order-no-row">
           <td class="section-label">オーダーNo</td>
           <td class="data" colspan="5"><input type="text" name="order_no" placeholder="例: 102P068219-001" class="soft-required" data-soft-required="1" /></td>
         </tr>
       </table>
 
-      <!-- 入力者 -->
       <div class="inputter-row no-print">
         <label>入力者</label>
         <select name="inputter" class="soft-required" data-soft-required="1">
@@ -155,48 +175,30 @@
           <option value="長谷部">長谷部</option>
           <option value="都合">都合</option>
           <option value="石橋">石橋</option>
-          <option value="ワーユ">ワーユ</option>
-          <option value="ユスフ">ユスフ</option>
         </select>
       </div>
 
-      <!-- 検査項目 -->
       <table>
         <tr><th>検査項目</th><th>規格</th><th>判定</th></tr>
-        <tr><td>本体取付け寸法</td><td>寸法測定検査</td>
-          <td><select name="judge1" class="no-print judge-select soft-required" data-soft-required="1"><option value="">-</option><option>合</option><option>否</option></select><span class="print-text"></span></td></tr>
-        <tr><td>摺動テスト</td><td>摺動テスト台走り・機能確認</td>
-          <td><select name="judge2" class="no-print judge-select soft-required" data-soft-required="1"><option value="">-</option><option>合</option><option>否</option></select><span class="print-text"></span></td></tr>
-        <tr><td>摺動時の異音</td><td>摺動テスト台走り時異音の有無確認</td>
-          <td><select name="judge3" class="no-print judge-select soft-required" data-soft-required="1"><option value="">-</option><option>無</option><option>有</option></select><span class="print-text"></span></td></tr>
-        <tr><td>外観検査</td><td>キズ・バリの有無確認</td>
-          <td><select name="judge4" class="no-print judge-select soft-required" data-soft-required="1"><option value="">-</option><option>合</option><option>否</option></select><span class="print-text"></span></td></tr>
-        <tr><td>カバーワイパーの隙間</td><td>ワイパー材 t=0.05にて確認</td>
-          <td><select name="judge5" class="no-print judge-select soft-required" data-soft-required="1"><option value="">-</option><option>合</option><option>否</option></select><span class="print-text"></span></td></tr>
-        <tr><td>※ワイパー長短確認</td><td>長辺/側面 各1本抜き長さ確認→再挿入</td>
-          <td><select name="judge6" class="no-print judge-select soft-required" data-soft-required="1"><option value="">-</option><option>合</option><option>否</option></select><span class="print-text"></span></td></tr>
-        <tr><td>*M8 ナット取付</td><td>裏面9ヶ所 ナット溶接確認</td>
-          <td><select name="judge7" class="no-print judge-select soft-required" data-soft-required="1"><option value="">-</option><option>合</option><option>否</option></select><span class="print-text"></span></td></tr>
+        <tr><td>本体取付け寸法</td><td>寸法測定検査</td><td><span class="judge-fixed">合</span></td></tr>
+        <tr><td>摺動テスト</td><td>摺動テスト台走り・機能確認</td><td><span class="judge-fixed">合</span></td></tr>
+        <tr><td>摺動時の異音</td><td>摺動テスト台走り時異音の有無確認</td><td><span class="judge-fixed">無</span></td></tr>
+        <tr><td>外観検査</td><td>キズ・バリの有無確認</td><td><span class="judge-fixed">合</span></td></tr>
+        <tr><td>カバーワイパーの隙間</td><td>ワイパー材 t=0.05にて確認</td><td><span class="judge-fixed">合</span></td></tr>
+        <tr><td>※ワイパー長短確認</td><td>長辺/側面 各1本抜き長さ確認→再挿入</td><td><span class="judge-fixed">合</span></td></tr>
+         <tr><td>*M8 ナット取付</td><td>裏面9ヶ所 ナット溶接確認</td><td><span class="judge-fixed">合</span></td></tr>
       </table>
 
-      <!-- 測定値 -->
       <table>
         <tr><th>項目</th><th>基準値</th><th>測定値</th></tr>
-        <tr><td>収縮時長さ(a)</td><td>365 mm以下</td>
-          <td class="td-measure"><div class="td-measure-grid"><input type="text" inputmode="numeric" name="a_length" placeholder="0-365" data-min="0" data-max="365" class="soft-required" data-soft-required="1" /><span>mm</span></div></td></tr>
-        <tr><td>伸長時長さ(b)</td><td>2,009 mm以上</td>
-          <td class="td-measure"><div class="td-measure-grid"><input type="text" inputmode="numeric" name="b_length" placeholder=">=2009" data-min="2009" class="soft-required" data-soft-required="1" /><span>mm</span></div></td></tr>
-        <tr><td>カバーストローク(s)</td><td>1,630 mm以上</td>
-          <td class="td-measure"><div class="td-measure-grid"><input type="text" inputmode="numeric" name="c_length" placeholder=">=1630" data-min="1630" class="soft-required" data-soft-required="1" /><span>mm</span></div></td></tr>
-        <tr><td>初期摺動抵抗</td><td>7.0 kg以下</td>
-          <td class="td-measure"><div class="td-measure-grid"><input type="text" inputmode="decimal" step="0.1" name="start_resist" placeholder="0-7.0" data-min="0" data-max="7" class="soft-required" data-soft-required="1" /><span>kg</span></div></td></tr>
-        <tr><td>中期摺動抵抗</td><td>7.0 kg以下</td>
-          <td class="td-measure"><div class="td-measure-grid"><input type="text" inputmode="decimal" step="0.1" name="mid_resist" placeholder="0-7.0" data-min="0" data-max="7" class="soft-required" data-soft-required="1" /><span>kg</span></div></td></tr>
-        <tr><td>終期摺動抵抗</td><td>7.0 kg以下</td>
-          <td class="td-measure"><div class="td-measure-grid"><input type="text" inputmode="decimal" step="0.1" name="end_resist" placeholder="0-7.0" data-min="0" data-max="7" class="soft-required" data-soft-required="1" /><span>kg</span></div></td></tr>
+        <tr><td>収縮時長さ(a)</td><td>365 mm以下</td><td class="td-measure"><div class="td-measure-grid"><input type="text" inputmode="numeric" name="a_length" placeholder="0-365" data-min="0" data-max="365" class="soft-required" data-soft-required="1" /><span>mm</span></div></td></tr>
+        <tr><td>伸長時長さ(b)</td><td>2009 mm以上</td><td class="td-measure"><div class="td-measure-grid"><input type="text" inputmode="numeric" name="b_length" placeholder=">=2009" data-min="2009" class="soft-required" data-soft-required="1" /><span>mm</span></div></td></tr>
+        <tr><td>カバーストローク(s)</td><td>1630 mm以上</td><td class="td-measure"><div class="td-measure-grid"><input type="text" inputmode="numeric" name="c_length" placeholder=">=1630" data-min="1630" class="soft-required" data-soft-required="1" /><span>mm</span></div></td></tr>
+        <tr><td>初期摺動抵抗</td><td>7.0 kg以下</td><td class="td-measure"><div class="td-measure-grid"><input type="text" inputmode="decimal" step="0.1" name="start_resist" placeholder="0-7.0" data-min="0" data-max="7" class="soft-required" data-soft-required="1" /><span>kg</span></div></td></tr>
+        <tr><td>中期摺動抵抗</td><td>7.0 kg以下</td><td class="td-measure"><div class="td-measure-grid"><input type="text" inputmode="decimal" step="0.1" name="mid_resist" placeholder="0-7.0" data-min="0" data-max="7" class="soft-required" data-soft-required="1" /><span>kg</span></div></td></tr>
+        <tr><td>終期摺動抵抗</td><td>7.0 kg以下</td><td class="td-measure"><div class="td-measure-grid"><input type="text" inputmode="decimal" step="0.1" name="end_resist" placeholder="0-7.0" data-min="0" data-max="7" class="soft-required" data-soft-required="1" /><span>kg</span></div></td></tr>
       </table>
 
-      <!-- 総合判定・備考 -->
       <div style="margin:2mm 0;">
         <label style="font-weight:bold;">総合判定</label>
         <select name="final_judgment" class="no-print" style="margin-left:20mm;" disabled>
@@ -204,6 +206,7 @@
         </select>
         <span class="print-text"></span>
       </div>
+
       <div style="margin:2mm 0;">
         <label style="font-weight:bold;">[備考]</label>
         <input type="text" name="bikou" style="width:70%;" />
@@ -242,48 +245,45 @@
   </form>
 
   <script>
-    /* ==== CONFIG ==== */
-    const APP_NS  = '330580v'; // unik per form
+    // === MULTI-FORM CONFIG ===
+    const APP_NS = '330580v';
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbxWxAa_dWQNoUPhWnkw3P22jgeW4vb44Z5ISuUyUWsAAroFzzE6iIVWMIpqqio6E5OgqA/exec';
-    const getSerialPrefix = () => document.querySelector('.serial-prefix')?.textContent?.trim() || 'XR3305-';
     const serverPrefix = () => `${APP_NS}::${getSerialPrefix()}`;
-    const SERIAL_SCOPE = () => `okuma:serial:${APP_NS}:${getSerialPrefix()}`;
+    const SERIAL_SCOPE = () => `okuma:serial:${APP_NS}:${getSerialPrefix() || 'XR3305-'}`;
 
-    /* ==== STATE ==== */
-    let PAD_DIGITS = 4;
-    const LOCK_TTL_SEC = 120; let __lockId=null; let __lockTimer=null;
+    // ====== STATE ======
+    let PAD_DIGITS = 4; // default; akan diambil dari server jika diset
 
-    /* ==== STAMP ==== */
-    function updateStampPreview(id, src){ document.getElementById(id).src = src || ''; }
-
-    /* ==== CLEAR ==== */
-    function clearAllFields(){
-      const form=document.getElementById('inspection-form');
+    // ====== UTIL & UI ======
+    function updateStampPreview(id, src) { document.getElementById(id).src = src || ''; }
+    function clearAllFields() {
+      const form = document.getElementById('inspection-form');
       form.reset();
-      ['stamp1','stamp2'].forEach(id=>document.getElementById(id).src='');
-      form.querySelectorAll('.td-measure-grid input.invalid').forEach(el=>el.classList.remove('invalid'));
+      ['stamp1','stamp2'].forEach(id => document.getElementById(id).src = '');
+      form.querySelectorAll('.td-measure-grid input.invalid').forEach(el => el.classList.remove('invalid'));
       wireDateMirror(); wireEnterNavigationAll(); wireSerialMirror();
       wireSoftRequired(); markSoftRequired();
-      setIssuedTodayIfEmpty(); wireHakkohidukeText();
-      updateOverallJudgment();
+      setTodayIfEmpty('hakkohiduke'); applyPrefix();
     }
 
-    /* ==== VALIDASI MEASURE ==== */
-    (function wireMeasureValidation(){
-      const fields=document.querySelectorAll('.td-measure-grid input');
-      const normalize=s=>s.replace(/[，,]/g,'.').replace(/[．｡。]/g,'.');
+    (function wireMeasureValidation() {
+      const fields = document.querySelectorAll('.td-measure-grid input');
+      const normalize = s => s.replace(/[，,]/g,'.').replace(/[．｡。]/g,'.');
       fields.forEach(inp=>{
-        const allowDec=(inp.getAttribute('step')||'').includes('.');
-        const MAX_INT_DIGITS=6;
+        const allowDec = (inp.getAttribute('step')||'').includes('.');
+        const MAX_INT_DIGITS = 6;
         inp.addEventListener('input',()=>{
-          let v=normalize(inp.value).replace(/[^\d.]/g,'');
-          if((v.match(/\./g)||[]).length>1){ const[h,...r]=v.split('.'); v=h+'.'+r.join('').replace(/\D/g,''); }
-          if(v.includes('.')){ let[d='',f='']=v.split('.'); d=d.slice(0,MAX_INT_DIGITS); v = allowDec ? (f===''?`${d}.`:`${d}.${(f||'').replace(/\D/g,'').slice(0,1)}`) : d; }
-          else v=v.slice(0,MAX_INT_DIGITS);
-          inp.value=v; inp.classList.remove('invalid'); markSoftRequired();
+          let v = normalize(inp.value).replace(/[^\d.]/g,'');
+          if((v.match(/\./g)||[]).length>1){ const [h,...r]=v.split('.'); v=h+'.'+r.join('').replace(/\D/g,''); }
+          if(v.includes('.')){
+            let[d='',f='']=v.split('.');
+            d=d.slice(0,MAX_INT_DIGITS);
+            v = allowDec ? (f===''?`${d}.`:`${d}.${(f||'').replace(/\D/g,'').slice(0,1)}`) : d;
+          } else v=v.slice(0,MAX_INT_DIGITS);
+          inp.value=v; inp.classList.remove('invalid');
         });
         inp.addEventListener('blur',()=>{
-          let v=normalize(inp.value);
+          let v = normalize(inp.value);
           if(v===''){ inp.classList.remove('invalid'); markSoftRequired(); return; }
           if(allowDec && /\.$/.test(v)) v=v.replace(/\.$/,'.0');
           const n=parseFloat(v), min=parseFloat(inp.dataset.min ?? '-Infinity'), max=parseFloat(inp.dataset.max ?? 'Infinity');
@@ -292,11 +292,11 @@
           inp.value = allowDec ? n.toFixed(1).replace(/\.0$/,'.0') : String(Math.trunc(n)).slice(0,MAX_INT_DIGITS);
           inp.classList.remove('invalid'); markSoftRequired();
         });
+        inp.addEventListener('input', markSoftRequired);
       });
     })();
 
-    /* ==== ENTER NAV ==== */
-    function wireEnterNavigationAll(){
+    function wireEnterNavigationAll() {
       const form=document.getElementById('inspection-form');
       const getFields=()=>Array.from(form.querySelectorAll('input, select, textarea')).filter(el=>!el.disabled && el.type!=='hidden' && el.offsetParent!==null);
       const move=(from,dir=+1)=>{const list=getFields(); const i=list.indexOf(from); if(i===-1) return; let j=i+dir; if(j>=list.length) j=0; if(j<0) j=list.length-1; const next=list[j]; next?.focus?.(); if(next && next.tagName==='INPUT' && !['checkbox','radio','file'].includes(next.type)) next.select?.();};
@@ -306,7 +306,6 @@
       });
     }
 
-    /* ==== MIRROR TANGGAL ==== */
     function wireDateMirror(){
       document.querySelectorAll('input[type="date"]').forEach(inp=>{
         const span=document.querySelector(`.print-text[data-from="${inp.name}"]`); if(!span) return;
@@ -316,242 +315,238 @@
       });
     }
 
-    /* ==== 発行年月日: TEXT YYYY/MM/DD ==== */
-    function formatYMD(d){ const yyyy=d.getFullYear(), mm=String(d.getMonth()+1).padStart(2,'0'), dd=String(d.getDate()).padStart(2,'0'); return `${yyyy}/${mm}/${dd}`; }
-    function validYMDText(s){
-      const m=/^\s*(\d{4})[\/\-\.](\d{1,2})[\/\-\.](\d{1,2})\s*$/.exec(s||''); if(!m) return null;
-      const y=+m[1], mo=+m[2], d=+m[3]; if(mo<1||mo>12||d<1||d>31) return null;
-      return `${String(y).padStart(4,'0')}/${String(mo).padStart(2,'0')}/${String(d).padStart(2,'0')}`;
-    }
-    function wireHakkohidukeText(){
-      const inp=document.querySelector('input[name="hakkohiduke"]');
-      const span=document.querySelector('.print-text[data-from="hakkohiduke"]');
-      if(!inp) return;
-      const sync=()=>{
-        const norm=validYMDText(inp.value);
-        if(norm && inp.value!==norm) inp.value=norm;
-        if(span) span.textContent = inp.value || '';
-        markSoftRequired();
-      };
-      inp.addEventListener('blur', sync);
-      inp.addEventListener('input', ()=>{ if(span) span.textContent=inp.value; markSoftRequired(); });
-      sync();
-    }
-    function setIssuedTodayIfEmpty(){
-      const inp=document.querySelector('input[name="hakkohiduke"]');
-      if(!inp) return;
-      if(!inp.value){ inp.value = formatYMD(new Date()); }
-      const span=document.querySelector('.print-text[data-from="hakkohiduke"]');
-      if(span) span.textContent = inp.value;
-    }
-
-    /* ==== SOFT REQUIRED ==== */
+    // ====== Soft-required highlight ======
     function markSoftRequired(){
       document.querySelectorAll('[data-soft-required]').forEach(el=>{
-        let filled=true;
-        if(el.tagName==='SELECT') filled=!!el.value;
-        else if(el.type==='date' || el.type==='text') filled=!!(el.value||'').trim();
-        if(el.classList.contains('invalid')) filled=false;
+        let filled = true;
+        if (el.tagName === 'SELECT') {
+          filled = !!el.value;
+        } else if (el.type === 'date' || el.type === 'text') {
+          filled = !!(el.value||'').trim();
+        }
+        if (el.classList.contains('invalid')) filled = false;
         el.classList.toggle('pending', !filled);
       });
     }
     function wireSoftRequired(){
       document.querySelectorAll('[data-soft-required]').forEach(el=>{
-        if(el.dataset.softReqWired==='1') return; el.dataset.softReqWired='1';
-        el.addEventListener('input',markSoftRequired); el.addEventListener('change',markSoftRequired);
+        if (el.dataset.softReqWired === '1') return;
+        el.dataset.softReqWired = '1';
+        el.addEventListener('input',  markSoftRequired);
+        el.addEventListener('change', markSoftRequired);
       });
     }
 
-    /* ==== SERIAL ==== */
-    const getSerialFull=()=>{ const p=getSerialPrefix(); const s=(document.querySelector('input[name="serial_no_suffix"]').value||'').replace(/[^\d]/g,'').trim(); return s?(p+s):p; };
-    function formatSuffix(num){ const s=String(num); return s.length>=PAD_DIGITS ? s : ('0'.repeat(PAD_DIGITS - s.length) + s); }
-    function setSerialSuffix(num){ const s=formatSuffix(num); const inp=document.querySelector('input[name="serial_no_suffix"]'); if(!inp) return; inp.value=s; inp.dispatchEvent(new Event('input',{bubbles:true})); markSoftRequired(); }
-    function wireSerialMirror(){ const out=document.querySelector('[data-serial-print]'); const inp=document.querySelector('input[name="serial_no_suffix"]'); if(!out) return; const upd=()=>{ out.textContent=getSerialFull(); }; inp?.addEventListener('input',upd); upd(); }
+    // ====== SERIAL / PREFIX ======
+    const getSerialPrefix = () => document.querySelector('.serial-prefix')?.textContent?.trim() || '';
+    const getZuban = () => (document.querySelector('input[name="zuban"]').value || '').trim();
+    const getSerialFull = () => {
+      const p = getSerialPrefix();
+      const s = (document.querySelector('input[name="serial_no_suffix"]').value || '').replace(/[^\d]/g,'').trim();
+      return s ? (p + s) : p;
+    };
+    function formatSuffix(num){ const s = String(num); return s.length >= PAD_DIGITS ? s : ('0'.repeat(PAD_DIGITS - s.length) + s); }
+    function setSerialSuffix(num){
+      const s = formatSuffix(num);
+      const inp = document.querySelector('input[name="serial_no_suffix"]'); if(!inp) return;
+      inp.value = s; inp.dispatchEvent(new Event('input', { bubbles:true })); markSoftRequired();
+    }
+    function wireSerialMirror() {
+      const out = document.querySelector('[data-serial-print]');
+      const inp = document.querySelector('input[name="serial_no_suffix"]');
+      if (!out) return;
+      const upd = () => { out.textContent = getSerialFull(); };
+      inp?.addEventListener('input', upd); upd();
+    }
+    function computePrefixFromZuban(z){ const digits=String(z||'').replace(/[^0-9]/g,''); return digits ? `Y${digits}-` : 'Y-'; }
+    function applyPrefix(){ const z = getZuban(); const pref = computePrefixFromZuban(z); const span = document.querySelector('.serial-prefix'); if(span) span.textContent = pref; }
 
-    /* ==== GAS API ==== */
+    // ====== SHARED COUNTER (GAS) ======
     async function apiGAS(body){
-      if(!GAS_URL) throw new Error('No GAS URL');
-      const res=await fetch(GAS_URL,{ method:'POST', headers:{'Content-Type':'text/plain;charset=utf-8'}, body:JSON.stringify(body) });
+      if(!GAS_URL || GAS_URL.includes('YOUR_WEB_APP_URL_HERE')) throw new Error('No GAS URL');
+      const res = await fetch(GAS_URL, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body: JSON.stringify(body) });
       if(!res.ok) throw new Error('GAS HTTP '+res.status);
       return await res.json();
     }
-    async function getNextSuffixShared(prefix){ const data=await apiGAS({ action:'nextSuffix', prefix }); if(typeof data?.suffix!=='number') throw new Error('Bad nextSuffix'); return data.suffix; }
-    async function setNextSuffixShared(prefix,next){ const data=await apiGAS({ action:'setNext', prefix, next }); if(data?.ok!==true) throw new Error('Bad setNext'); return true; }
-    async function setDigitsShared(prefix,digits){ const data=await apiGAS({ action:'setDigits', prefix, digits }); if(data?.ok!==true) throw new Error('Bad setDigits'); return true; }
-    async function getInfoShared(prefix){ return await apiGAS({ action:'getInfo', prefix }); }
+    async function getNextSuffixShared(prefix){ const data = await apiGAS({ action:'nextSuffix', prefix }); if(typeof data?.suffix !== 'number') throw new Error('Bad nextSuffix'); return data.suffix; }
+    async function setNextSuffixShared(prefix, next){ const data = await apiGAS({ action:'setNext', prefix, next }); if(data?.ok !== true) throw new Error('Bad setNext'); return true; }
+    async function setDigitsShared(prefix, digits){ const data = await apiGAS({ action:'setDigits', prefix, digits }); if(data?.ok !== true) throw new Error('Bad setDigits'); return true; }
+    async function getInfoShared(prefix){ const data = await apiGAS({ action:'getInfo', prefix }); return data; }
 
     async function assignNextSerialSuffix(){
-      const prefix=serverPrefix();
+      const prefix = serverPrefix();
       try{
-        const nxt=await getNextSuffixShared(prefix);
-        localStorage.setItem(`${SERIAL_SCOPE()}:lastSuffix`, String(nxt));
+        const nxt = await getNextSuffixShared(prefix);
+        const KEY = `${SERIAL_SCOPE()}:lastSuffix`;
+        localStorage.setItem(KEY, String(nxt));
         setSerialSuffix(nxt);
         return;
-      }catch(e){}
-      const KEY=`${SERIAL_SCOPE()}:lastSuffix`;
-      const next=(()=>{ const last=parseInt(localStorage.getItem(KEY)||'0',10)||0; const n=last+1; localStorage.setItem(KEY,String(n)); return n; })();
+      }catch(e){ /* fallback local */ }
+      const KEY = `${SERIAL_SCOPE()}:lastSuffix`;
+      const next = await (async()=>{
+        const last = parseInt(localStorage.getItem(KEY) || '0', 10) || 0;
+        const nxt = last + 1; localStorage.setItem(KEY, String(nxt)); return nxt;
+      })();
       setSerialSuffix(next);
     }
 
-    /* ==== LOCK lintas perangkat ==== */
+    // ====== LOCK (lintas perangkat) ======
+    const LOCK_TTL_SEC = 120; let __lockId = null; let __lockTimer = null;
     function getClientId(){ const k='okuma:clientId'; let id=localStorage.getItem(k); if(!id){ id=crypto.randomUUID(); localStorage.setItem(k,id);} return id; }
-    function showLockOverlay(show){ const ov=document.getElementById('lock-overlay'); if(ov) ov.style.display=show?'flex':'none'; }
-    function setEditingEnabled(enabled){ const disabled=!enabled; document.getElementById('inspection-form').querySelectorAll('input,select,textarea,button').forEach(el=>{ if(!el.closest('.toolbar')) el.disabled=disabled; }); }
-    async function acquireSharedLock(prefix){ try{ const data=await apiGAS({ action:'acquireLock', prefix, clientId:getClientId(), ttlSec:LOCK_TTL_SEC }); if(data?.ok){ __lockId=data.lockId||'local'; heartbeatLock(prefix); return true; } return false; }catch(e){ return true; } }
-    function heartbeatLock(prefix){ if(__lockTimer) clearInterval(__lockTimer); if(!__lockId) return; __lockTimer=setInterval(async()=>{ try{ await apiGAS({ action:'extendLock', lockId:__lockId, prefix, clientId:getClientId(), ttlSec:LOCK_TTL_SEC }); }catch(e){} }, 60000); }
-    async function releaseSharedLock(){ if(!__lockId) return; try{ await apiGAS({ action:'releaseLock', lockId:__lockId, clientId:getClientId() }); }catch(e){} __lockId=null; if(__lockTimer){ clearInterval(__lockTimer); __lockTimer=null; } }
-    async function ensureHasLockOrAcquire(){ const prefix=serverPrefix(); if(__lockId) return true; const ok=await acquireSharedLock(prefix); if(!ok){ showLockOverlay(true); setEditingEnabled(false); } else { showLockOverlay(false); setEditingEnabled(true); } return ok; }
+    function setEditingEnabled(enabled){ const disabled = !enabled; const form=document.getElementById('inspection-form'); form.querySelectorAll('input,select,textarea,button').forEach(el=>{ el.disabled = disabled; }); }
+    function showLockOverlay(show){ const ov=document.getElementById('lock-overlay'); if(ov){ ov.style.display = show? 'flex':'none'; } }
+    async function acquireSharedLock(prefix){
+      try{
+        const data = await apiGAS({ action:'acquireLock', prefix, clientId:getClientId(), ttlSec:LOCK_TTL_SEC });
+        if(data?.ok){ __lockId = data.lockId || 'local'; heartbeatLock(prefix); return true; }
+        return false;
+      }catch(e){ return true; }
+    }
+    function heartbeatLock(prefix){
+      if(__lockTimer) clearInterval(__lockTimer); if(!__lockId) return;
+      __lockTimer = setInterval(async()=>{
+        try{ await apiGAS({ action:'extendLock', lockId:__lockId, prefix, clientId:getClientId(), ttlSec:LOCK_TTL_SEC }); }catch(e){}
+      }, 60000);
+    }
+    async function releaseSharedLock(){
+      if(!__lockId) return;
+      try{ await apiGAS({ action:'releaseLock', lockId:__lockId, clientId:getClientId() }); }catch(e){}
+      __lockId=null; if(__lockTimer){ clearInterval(__lockTimer); __lockTimer=null; }
+    }
+    async function ensureHasLockOrAcquire(){
+      const prefix = serverPrefix();
+      if(__lockId) return true;
+      const ok = await acquireSharedLock(prefix);
+      if(!ok){ showLockOverlay(true); setEditingEnabled(false); }
+      else { showLockOverlay(false); setEditingEnabled(true); }
+      return ok;
+    }
 
-    /* ==== FILENAME (with HHMM) ==== */
-    const sanitize=s=>(s||'').replace(/[\\/:*?"<>|]/g,'').trim();
+    // ====== PENAMAAN FILE (dengan waktu) ======
+    const sanitize = s => (s||'').replace(/[\\/:*?"<>|]/g,'').trim();
     function nowHHMM(){ const t=new Date(); return String(t.getHours()).padStart(2,'0')+String(t.getMinutes()).padStart(2,'0'); }
     function computeFilename(){
       const md=document.querySelector('input[name="makingdate"]').value;
-      const ymd = md ? md.replace(/-/g,'') : (()=>{ const t=new Date(); return t.getFullYear()+String(t.getMonth()+1).padStart(2,'0')+String(t.getDate()).padStart(2,'0'); })();
+      const ymd = md ? md.replace(/-/g,'') : (()=>{const t=new Date(); return t.getFullYear()+String(t.getMonth()+1).padStart(2,'0')+String(t.getDate()).padStart(2,'0');})();
       const hm = nowHHMM();
-      const customer=sanitize(document.querySelector('.header-table tr:nth-child(1) td:nth-child(2)')?.textContent || 'no-customer');
-      const zuban   =sanitize(document.querySelector('.header-table tr:nth-child(2) td:nth-child(6)')?.textContent || 'no-zuban');
-      const inputter=sanitize(document.querySelector('select[name="inputter"]').value || 'no-name');
-      const orderNo =sanitize(document.querySelector('input[name="order_no"]').value || 'no-order');
-      const serialNo=sanitize(getSerialFull() || 'no-serial');
+      const customer = sanitize(document.querySelector('.header-table tr:nth-child(1) td:nth-child(2)')?.textContent || 'no-customer');
+      const zuban    = sanitize(document.querySelector('input[name="zuban"]').value || 'no-zuban');
+      const inputter = sanitize(document.querySelector('select[name="inputter"]').value || 'no-name');
+      const orderNo  = sanitize(document.querySelector('input[name="order_no"]').value || 'no-order');
+      const serialNo = sanitize(getSerialFull() || 'no-serial');
       return `${ymd}-${hm}_${customer}_${zuban}_${inputter}_${orderNo}_${serialNo}.pdf`;
     }
 
-    /* ==== RENDER & PRINT ==== */
-    async function renderFormCanvas(){
+    // ====== RENDER & PRINT ======
+    async function renderFormCanvas() {
       const el=document.querySelector('.b5-preview');
-      return html2canvas(el,{ scale:2, backgroundColor:'#FFFFFF', useCORS:true,
-        onclone:(doc)=>{ doc.querySelectorAll('.no-print').forEach(e=>e.style.display='none'); doc.querySelectorAll('.print-text').forEach(e=>e.style.display='inline'); }
+      return html2canvas(el,{
+        scale:2, backgroundColor:'#FFFFFF', useCORS:true,
+        onclone:(doc)=>{
+          doc.querySelectorAll('.no-print').forEach(e=>e.style.display='none');
+          doc.querySelectorAll('.print-text').forEach(e=>e.style.display='inline');
+        }
       });
     }
-    async function buildPdfDoc(){ const { jsPDF }=window.jspdf; const doc=new jsPDF({orientation:'portrait',unit:'mm',format:'b5'}); const canvas=await renderFormCanvas(); doc.addImage(canvas.toDataURL('image/png'),'PNG',7,7,162,236); return doc; }
-    async function printViaPDF(){ const ok=await ensureHasLockOrAcquire(); if(!ok){ alert('現在ほかの端末が使用中のため、印刷できません。'); return; } await assignNextSerialSuffix(); const doc=await buildPdfDoc(); if(doc.autoPrint) doc.autoPrint(); const blobUrl=doc.output('bloburl'); window.open(blobUrl,'_blank'); }
+    async function buildPdfDoc(){
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({ orientation:'portrait', unit:'mm', format:'b5' });
+      const canvas = await renderFormCanvas();
+      doc.addImage(canvas.toDataURL('image/png'), 'PNG', 7, 7, 162, 236);
+      return doc;
+    }
+    async function printViaPDF(){
+      const ok = await ensureHasLockOrAcquire();
+      if(!ok){ alert('現在ほかの端末が使用中のため、印刷できません。'); return; }
+      await assignNextSerialSuffix();
+      const doc = await buildPdfDoc();
+      if(doc.autoPrint) doc.autoPrint();
+      const blobUrl = doc.output('bloburl'); window.open(blobUrl, '_blank');
+    }
 
-    /* ==== Save to NAS (duplikat guard by 製造No) ==== */
-    const DB_NAME='form-folder-db', STORE='folders'; let __db; const FIXED_KEY='Okuma_MB80V';
-    function openDB(){ return new Promise((resolve,reject)=>{ const req=indexedDB.open(DB_NAME,1); req.onupgradeneeded=()=>req.result.createObjectStore(STORE); req.onsuccess=()=>{ __db=req.result; resolve(); }; req.onerror=()=>reject(req.error); }); }
+    // ====== SAVE to NAS (duplicate guard by serial; zero-insensitive) ======
+    const DB_NAME='form-folder-db', STORE='folders'; let __db; const FIXED_KEY='Okuma_MB46V';
+    function openDB(){ return new Promise((resolve,reject)=>{ const req=indexedDB.open(DB_NAME,1); req.onupgradeneeded=()=>req.result.createObjectStore(STORE); req.onsuccess=()=>{ __db=req.result; resolve(); }; req.onerror=()=>reject(req.error); });}
     async function openDBIfNeeded(){ if(!__db) await openDB(); }
-    async function putHandle(key,handle){ await openDBIfNeeded(); return new Promise((res,rej)=>{ const tx=__db.transaction(STORE,'readwrite'); tx.objectStore(STORE).put(handle,key); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); }); }
+    async function putHandle(key, handle){ await openDBIfNeeded(); return new Promise((res,rej)=>{ const tx=__db.transaction(STORE,'readwrite'); tx.objectStore(STORE).put(handle,key); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); }); }
     async function getHandle(key){ await openDBIfNeeded(); return new Promise((res,rej)=>{ const tx=__db.transaction(STORE,'readonly'); const r=tx.objectStore(STORE).get(key); r.onsuccess=()=>res(r.result||null); r.onerror=()=>rej(r.error); }); }
-
-    function escapeRe(s){ return s.replace(/[-\\/^$*+?.()|[\\]{}]/g,'\\$&'); }
-    async function serialExists(dir, rawPrefix, numeric){
+    async function serialExists(dir, prefix, numeric){
       if(!dir.entries) return false;
-      const pattern=new RegExp(`_${escapeRe(rawPrefix)}0*${numeric}\\.pdf$`);
-      for await (const [name] of dir.entries()){
+      const pattern = new RegExp(`_${prefix}0*${numeric}\\.pdf$`);
+      for await (const [name,handle] of dir.entries()){
         if(/\.pdf$/i.test(name) && pattern.test(name)) return name;
       }
       return false;
     }
 
     async function saveToNASFixed(){
-      const ok=await ensureHasLockOrAcquire();
+      const ok = await ensureHasLockOrAcquire();
       if(!ok){ alert('現在ほかの端末が使用中のため、保存できません。'); return; }
       await assignNextSerialSuffix();
-      const fileName=computeFilename();
-
-      if(!window.showDirectoryPicker){ const doc=await buildPdfDoc(); doc.save(fileName); return; }
-
+      const fileName = computeFilename();
+      if(!window.showDirectoryPicker){ const doc = await buildPdfDoc(); doc.save(fileName); return; }
       try{
-        let dir=await getHandle(FIXED_KEY);
-        if(!dir){ dir=await window.showDirectoryPicker({mode:'readwrite'}); await navigator.storage?.persist?.(); await putHandle(FIXED_KEY,dir); }
+        let dir = await getHandle(FIXED_KEY);
+        if(!dir){
+          dir = await window.showDirectoryPicker({ mode:'readwrite' });
+          await navigator.storage?.persist?.();
+          await putHandle(FIXED_KEY, dir);
+        }
+        let perm = await dir.queryPermission?.({ mode:'readwrite' });
+        if(perm!=='granted'){
+          perm = await dir.requestPermission?.({ mode:'readwrite' });
+          if(perm!=='granted'){ const doc = await buildPdfDoc(); doc.save(fileName); return; }
+        }
 
-        let perm=await dir.queryPermission?.({mode:'readwrite'});
-        if(perm!=='granted'){ perm=await dir.requestPermission?.({mode:'readwrite'}); if(perm!=='granted'){ const doc=await buildPdfDoc(); doc.save(fileName); return; } }
-
-        const rawPrefix=getSerialPrefix();
-        const suffixStr=(document.querySelector('input[name="serial_no_suffix"]').value||'').trim();
-        const numeric=parseInt(suffixStr.replace(/^0+/,'')||'0',10);
-        const dupe=await serialExists(dir, rawPrefix, numeric);
+        // Detect duplicate regardless of left padding
+        const rawPrefix = getSerialPrefix(); // ex: 'Y282520-'
+        const suffixStr = (document.querySelector('input[name="serial_no_suffix"]').value || '').trim();
+        const numeric = parseInt(suffixStr.replace(/^0+/,'') || '0', 10);
+        const dupe = await serialExists(dir, sanitize(rawPrefix), numeric);
         if(dupe){ alert(`同じ製造Noのファイルが既に存在します:\n${dupe}\n保存を中止しました。`); return; }
 
-        const doc=await buildPdfDoc();
-        const fh=await dir.getFileHandle(fileName,{create:true});
-        const w=await fh.createWritable(); await w.write(doc.output('blob')); await w.close();
-        const t=new Date(); alert(`保存しました: ${fileName}\n時刻: ${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}`);
+        const doc = await buildPdfDoc();
+        const fh = await dir.getFileHandle(fileName, { create:true });
+        const w = await fh.createWritable();
+        await w.write(doc.output('blob')); await w.close();
+        const t=new Date();
+        alert(`保存しました: ${fileName}\n時刻: ${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}`);
       }catch(e){
-        console.error('NAS書き込み失敗、Downloadsへ保存します。', e);
-        const doc=await buildPdfDoc(); doc.save(fileName);
+        console.error('Gagal tulis NAS; fallback ke Download.', e);
+        const doc = await buildPdfDoc(); doc.save(fileName);
       }
     }
 
-    /* ==== 総合判定（判定+測定値）==== */
-    function isOverallPass(){
-      // 判定: 1,2,4,5,6,7 = 合 ; 3 = 無
-      const v = n => document.querySelector(`select[name="${n}"]`)?.value || '';
-      const j = [v('judge1'),v('judge2'),v('judge3'),v('judge4'),v('judge5'),v('judge6'),v('judge7')];
-      if(j.some(x=>!x)) return null; // ada yang belum diisi
-
-      const okJudge = (j[0]==='合')&&(j[1]==='合')&&(j[2]==='無')&&(j[3]==='合')&&(j[4]==='合')&&(j[5]==='合')&&(j[6]==='合');
-      if(!okJudge) return false;
-
-      // 測定値: a<=365, b>=2009, c>=1630, resist<=7.0
-      const ranges = [
-        {name:"a_length",min:0,max:365},
-        {name:"b_length",min:2009},
-        {name:"c_length",min:1630},
-        {name:"start_resist",min:0,max:7},
-        {name:"mid_resist",min:0,max:7},
-        {name:"end_resist",min:0,max:7},
-      ];
-      for(const r of ranges){
-        const el=document.querySelector(`input[name="${r.name}"]`);
-        if(!el || !el.value) return null; // belum diisi -> kosongkan hasil
-        const val=parseFloat(el.value);
-        if(Number.isNaN(val)) return false;
-        if(r.min!==undefined && val<r.min) return false;
-        if(r.max!==undefined && val>r.max) return false;
+    function setTodayIfEmpty(inputName){
+      const inp = document.querySelector(`input[name="${inputName}"]`);
+      if(!inp) return;
+      if(!inp.value){
+        const t = new Date();
+        const yyyy = t.getFullYear();
+        const mm   = String(t.getMonth()+1).padStart(2,'0');
+        const dd   = String(t.getDate()).padStart(2,'0');
+        inp.value = `${yyyy}-${mm}-${dd}`;
+        inp.dispatchEvent(new Event('change',{bubbles:true}));
       }
-      return true;
-    }
-    function updateOverallJudgment(){
-      const sel=document.querySelector('select[name="final_judgment"]');
-      const span=sel.nextElementSibling;
-      const res=isOverallPass();
-      if(res===true) sel.value='合格';
-      else if(res===false) sel.value='否';
-      else sel.value=''; // kosong
-      if(span) span.textContent=sel.value;
     }
 
-    /* ==== UI: set next & digits ==== */
-    async function configureNextSerial(){
-      const prefix=serverPrefix();
-      const input=prompt(`現在のプレフィックス: ${prefix}\n次の製造No（整数）を入力してください`, '');
-      if(input==null) return;
-      const num=parseInt(String(input).replace(/\D/g,''),10);
-      if(!(num>=1)){ alert('1以上の整数で入力してください'); return; }
-      try{ await setNextSuffixShared(prefix,num); }catch(e){ localStorage.setItem(`${SERIAL_SCOPE()}:lastSuffix`, String(num-1)); }
-      setSerialSuffix(num); alert(`次の製造Noを ${prefix}${formatSuffix(num)} に設定しました`);
-    }
-    async function configureDigits(){
-      const prefix=serverPrefix();
-      const input=prompt(`現在のプレフィックス: ${prefix}\n表示桁数（例: 4, 5, 6）。空欄で取消`, String(PAD_DIGITS));
-      if(input==null || input==='') return;
-      const d=parseInt(String(input).replace(/\D/g,''),10);
-      if(!(d>=1 && d<=12)){ alert('1〜12 の範囲で入力してください'); return; }
-      try{ await setDigitsShared(prefix,d); PAD_DIGITS=d; const cur=(document.querySelector('input[name="serial_no_suffix"]').value||'').replace(/\D/g,''); if(cur) setSerialSuffix(parseInt(cur,10)); alert(`表示桁数を ${d} に設定しました`); }
-      catch(e){ PAD_DIGITS=d; const cur=(document.querySelector('input[name="serial_no_suffix"]').value||'').replace(/\D/g,''); if(cur) setSerialSuffix(parseInt(cur,10)); }
-    }
-
-    /* ==== INIT ==== */
-    window.addEventListener('load', async ()=>{
-      wireDateMirror(); wireHakkohidukeText(); wireEnterNavigationAll(); wireSerialMirror();
+    // ====== INIT ======
+    window.addEventListener('load', async () => {
+      wireDateMirror(); wireEnterNavigationAll(); wireSerialMirror();
+      setTodayIfEmpty('hakkohiduke'); applyPrefix();
       wireSoftRequired(); markSoftRequired();
-      setIssuedTodayIfEmpty();
-      updateOverallJudgment();
-
-      // digits dari server (kalau ada)
-      try{ const info=await getInfoShared(serverPrefix()); if(typeof info?.digits==='number' && info.digits>=1) PAD_DIGITS=info.digits; }catch(e){}
+      document.querySelector('input[name="zuban"]').addEventListener('change', ()=>{ applyPrefix(); });
+      try{
+        const info = await getInfoShared(serverPrefix());
+        if (typeof info?.digits === 'number' && info.digits >= 1) PAD_DIGITS = info.digits;
+      }catch(e){}
       await ensureHasLockOrAcquire();
-
-      // evaluasi otomatis saat ada perubahan
-      document.querySelectorAll('select.judge-select, .td-measure-grid input').forEach(el=>{
-        el.addEventListener('change', updateOverallJudgment);
-        el.addEventListener('input',  updateOverallJudgment);
-      });
     });
     window.addEventListener('beforeunload', releaseSharedLock);
+
+    // dummy—placeholder untuk tombol yang ada di toolbar (agar tidak error jika belum dibuat)
+    function configureNextSerial(){ alert('未実装: 次番号設定'); }
+    function configureDigits(){ alert('未実装: 桁数設定'); }
   </script>
 </body>
 </html>
