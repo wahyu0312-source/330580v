@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>出荷検査成績書 3305 MB-80V</title>
+  <title>出荷検査成績書 3305 MB-80V（X軸 右）</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -23,15 +23,12 @@
     /* ===== table base ===== */
     table { width:100%; border-collapse:collapse; margin-bottom:4mm; }
     th, td { border:.3mm solid #333; padding:1.2mm 1mm; text-align:center; background:#fff; vertical-align:middle; }
-    /* header cells now also white (no gray) */
     th { background:#fff; }
-    /* section label juga putih */
     .section-label { text-align:left; font-weight:bold; background:#fff; }
 
     .header-table td, .header-table th { white-space:nowrap; word-break:keep-all; }
     .header-table input { min-width:0; }
 
-    /* util: paksa isi rata kiri di sel tertentu */
     .ta-left { text-align:left !important; }
 
     .td-measure { padding:0 !important; }
@@ -47,7 +44,7 @@
     .stamp-label { font-size:3mm; margin-bottom:1mm; text-align:center; }
     .signature-box {
       width:15mm; height:15mm; border:.3mm solid #333; border-radius:2mm;
-      background:#fff; /* putihkan kotak stempel */
+      background:#fff;
       display:flex; align-items:center; justify-content:center; overflow:hidden;
     }
     .signature-box img { width:9mm; height:9mm; object-fit:contain; }
@@ -81,12 +78,11 @@
     }
 
     .td-measure-grid input.invalid { background:#ffebee; box-shadow:inset 0 0 0 1px #d32f2f; }
-    @media print { .td-measure-grid input.invalid { background:transparent !important; box-shadow:none !important; } }
+    @media print { .td-measure-grid input.invalid { background:transparent !important; box-shadow:none !important; }
 
     .serial-wrap { display:grid; grid-template-columns:auto 1fr; align-items:center; gap:1mm; }
     .serial-prefix { white-space:nowrap; }
 
-    /* highlight soft-required tetap (untuk input guide saat layar) */
     .soft-required.pending { background-color:#06e8f8; box-shadow:inset 0 0 0 1px rgba(242,201,76,.25); transition:background-color .25s ease; }
     @media print { .soft-required.pending { background:transparent !important; box-shadow:none !important; } }
   </style>
@@ -186,7 +182,7 @@
         <tr><td>外観検査</td><td>キズ・バリの有無確認</td><td><span class="judge-fixed">合</span></td></tr>
         <tr><td>カバーワイパーの隙間</td><td>ワイパー材 t=0.05にて確認</td><td><span class="judge-fixed">合</span></td></tr>
         <tr><td>※ワイパー長短確認</td><td>長辺/側面 各1本抜き長さ確認→再挿入</td><td><span class="judge-fixed">合</span></td></tr>
-         <tr><td>*M8 ナット取付</td><td>裏面9ヶ所 ナット溶接確認</td><td><span class="judge-fixed">合</span></td></tr>
+        <tr><td>*M8 ナット取付</td><td>裏面9ヶ所 ナット溶接確認</td><td><span class="judge-fixed">合</span></td></tr>
       </table>
 
       <table>
@@ -246,7 +242,7 @@
 
   <script>
     // === MULTI-FORM CONFIG ===
-    const APP_NS = '330580v';
+    const APP_NS = 'mb80v_xr';
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbxWxAa_dWQNoUPhWnkw3P22jgeW4vb44Z5ISuUyUWsAAroFzzE6iIVWMIpqqio6E5OgqA/exec';
     const serverPrefix = () => `${APP_NS}::${getSerialPrefix()}`;
     const SERIAL_SCOPE = () => `okuma:serial:${APP_NS}:${getSerialPrefix() || 'XR3305-'}`;
@@ -319,11 +315,8 @@
     function markSoftRequired(){
       document.querySelectorAll('[data-soft-required]').forEach(el=>{
         let filled = true;
-        if (el.tagName === 'SELECT') {
-          filled = !!el.value;
-        } else if (el.type === 'date' || el.type === 'text') {
-          filled = !!(el.value||'').trim();
-        }
+        if (el.tagName === 'SELECT') filled = !!el.value;
+        else if (el.type === 'date' || el.type === 'text') filled = !!(el.value||'').trim();
         if (el.classList.contains('invalid')) filled = false;
         el.classList.toggle('pending', !filled);
       });
@@ -358,11 +351,16 @@
       const upd = () => { out.textContent = getSerialFull(); };
       inp?.addEventListener('input', upd); upd();
     }
-   function computePrefixFromZuban(z){
-  const d = String(z||'').replace(/\D/g,'').slice(0,4); // 4 digit pertama
-  return d ? `XR${d}-` : 'XR-';
-}
- function applyPrefix(){ const z = getZuban(); const pref = computePrefixFromZuban(z); const span = document.querySelector('.serial-prefix'); if(span) span.textContent = pref; }
+    function computePrefixFromZuban(z){
+      const d = String(z||'').replace(/\D/g,'').slice(0,4); // 4 digit pertama
+      return d ? `XR${d}-` : 'XR-';
+    }
+    function applyPrefix(){
+      const z = getZuban();
+      const pref = computePrefixFromZuban(z);
+      const span = document.querySelector('.serial-prefix');
+      if(span) span.textContent = pref;
+    }
 
     // ====== SHARED COUNTER (GAS) ======
     async function apiGAS(body){
@@ -468,7 +466,7 @@
     }
 
     // ====== SAVE to NAS (duplicate guard by serial; zero-insensitive) ======
-    const DB_NAME='form-folder-db', STORE='folders'; let __db; const FIXED_KEY='Okuma_MB46V';
+    const DB_NAME='form-folder-db', STORE='folders'; let __db; const FIXED_KEY='Okuma_MB80V_XR';
     function openDB(){ return new Promise((resolve,reject)=>{ const req=indexedDB.open(DB_NAME,1); req.onupgradeneeded=()=>req.result.createObjectStore(STORE); req.onsuccess=()=>{ __db=req.result; resolve(); }; req.onerror=()=>reject(req.error); });}
     async function openDBIfNeeded(){ if(!__db) await openDB(); }
     async function putHandle(key, handle){ await openDBIfNeeded(); return new Promise((res,rej)=>{ const tx=__db.transaction(STORE,'readwrite'); tx.objectStore(STORE).put(handle,key); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); }); }
@@ -476,7 +474,7 @@
     async function serialExists(dir, prefix, numeric){
       if(!dir.entries) return false;
       const pattern = new RegExp(`_${prefix}0*${numeric}\\.pdf$`);
-      for await (const [name,handle] of dir.entries()){
+      for await (const [name] of dir.entries()){
         if(/\.pdf$/i.test(name) && pattern.test(name)) return name;
       }
       return false;
@@ -502,7 +500,7 @@
         }
 
         // Detect duplicate regardless of left padding
-        const rawPrefix = getSerialPrefix(); // ex: 'Y282520-'
+        const rawPrefix = getSerialPrefix(); // ex: 'XR3305-'
         const suffixStr = (document.querySelector('input[name="serial_no_suffix"]').value || '').trim();
         const numeric = parseInt(suffixStr.replace(/^0+/,'') || '0', 10);
         const dupe = await serialExists(dir, sanitize(rawPrefix), numeric);
@@ -553,5 +551,3 @@
   </script>
 </body>
 </html>
-
-
