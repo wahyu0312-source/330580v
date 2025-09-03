@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <title>出荷検査成績書 3305 MB-80V（X軸 右）</title>
+  <title>出荷検査成績書 3305-20 MB-80V（X軸 右=XR）</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -78,7 +78,7 @@
     }
 
     .td-measure-grid input.invalid { background:#ffebee; box-shadow:inset 0 0 0 1px #d32f2f; }
-    @media print { .td-measure-grid input.invalid { background:transparent !important; box-shadow:none !important; }
+    @media print { .td-measure-grid input.invalid { background:transparent !important; box-shadow:none !important; } }
 
     .serial-wrap { display:grid; grid-template-columns:auto 1fr; align-items:center; gap:1mm; }
     .serial-prefix { white-space:nowrap; }
@@ -92,16 +92,16 @@
     <button type="button" onclick="printViaPDF()">🖨️ 印刷</button>
     <button type="button" onclick="saveToNASFixed()">💾 NAS保存</button>
     <button type="button" onclick="clearAllFields()">🧹 全てクリア</button>
-    <button type="button" onclick="configureNextSerial()">🔢 番号設定</button>
+    <button type="button" onclick="configureNextSerial()">🔢 次番号設定</button>
     <button type="button" onclick="configureDigits()">#️⃣ 桁数設定</button>
+    <button type="button" onclick="pickFolder()">📁 フォルダ選択</button>
   </div>
 
   <!-- overlay lock -->
   <div id="lock-overlay" style="position:fixed;inset:0;background:rgba(255,255,255,.9);display:none;align-items:center;justify-content:center;z-index:9998;text-align:center;padding:20mm;">
     <div style="max-width:120mm;line-height:1.6;font-size:4.5mm;color:#b91c1c;">
       <div style="font-weight:bold;font-size:5mm;margin-bottom:4mm;">このフォームは現在、他の端末で編集中です</div>
-      別端末で保存/印刷が終わるまでお待ちください。<br/>
-      （管理者が必要ならロックを解除できます）
+      別端末で保存/印刷が終わるまでお待ちください。<br/>（管理者が必要ならロックを解除できます）
     </div>
   </div>
 
@@ -112,42 +112,23 @@
 
       <table class="header-table">
         <tr>
-          <td class="section-label">客先</td>
-          <td>オークマ株式会社 御中</td>
-
-          <td class="section-label">管理No.</td>
-          <td class="ta-left">TTS60-01-690</td>
-
+          <td class="section-label">客先</td><td>オークマ株式会社 御中</td>
+          <td class="section-label">管理No.</td><td class="ta-left">TTS60-01-690</td>
           <td class="section-label">発行年月日</td>
-          <td class="ta-left">
-            <input type="date" name="hakkohiduke" class="no-print" />
-            <span class="print-text" data-from="hakkohiduke"></span>
-          </td>
+          <td class="ta-left"><input type="date" name="hakkohiduke" class="no-print" /><span class="print-text" data-from="hakkohiduke"></span></td>
         </tr>
 
         <tr>
-          <td class="section-label">機種</td>
-          <td class="ta-left">MB-80V</td>
-
-          <td class="section-label">品番</td>
-          <td>H1090-0055-19</td>
-
+          <td class="section-label">機種</td><td class="ta-left">MB-80V</td>
+          <td class="section-label">品番</td><td>H1090-0055-19</td>
           <td class="section-label">図番</td>
-          <td>
-            <input type="text" name="zuban" value="3305-20" class="soft-required" data-soft-required="1" />
-          </td>
+          <td><input type="text" name="zuban" value="3305-20" class="soft-required" data-soft-required="1" /></td>
         </tr>
 
         <tr>
-          <td class="section-label">品名</td>
-          <td class="ta-left">X軸(右側)SG</td>
-
+          <td class="section-label">品名</td><td class="ta-left">X軸(右側)SG</td>
           <td class="section-label">製造日</td>
-          <td class="ta-left">
-            <input type="date" name="makingdate" class="no-print soft-required" data-soft-required="1" />
-            <span class="print-text" data-from="makingdate"></span>
-          </td>
-
+          <td class="ta-left"><input type="date" name="makingdate" class="no-print soft-required" data-soft-required="1" /><span class="print-text" data-from="makingdate"></span></td>
           <td class="section-label">製造No</td>
           <td class="ta-left">
             <div class="serial-wrap no-print">
@@ -241,14 +222,12 @@
   </form>
 
   <script>
-    // === MULTI-FORM CONFIG ===
+    // === CONFIG ===
     const APP_NS = 'mb80v_xr';
     const GAS_URL = 'https://script.google.com/macros/s/AKfycbxWxAa_dWQNoUPhWnkw3P22jgeW4vb44Z5ISuUyUWsAAroFzzE6iIVWMIpqqio6E5OgqA/exec';
     const serverPrefix = () => `${APP_NS}::${getSerialPrefix()}`;
     const SERIAL_SCOPE = () => `okuma:serial:${APP_NS}:${getSerialPrefix() || 'XR3305-'}`;
-
-    // ====== STATE ======
-    let PAD_DIGITS = 4; // default; akan diambil dari server jika diset
+    let PAD_DIGITS = 4;
 
     // ====== UTIL & UI ======
     function updateStampPreview(id, src) { document.getElementById(id).src = src || ''; }
@@ -311,7 +290,6 @@
       });
     }
 
-    // ====== Soft-required highlight ======
     function markSoftRequired(){
       document.querySelectorAll('[data-soft-required]').forEach(el=>{
         let filled = true;
@@ -361,10 +339,11 @@
       const span = document.querySelector('.serial-prefix');
       if(span) span.textContent = pref;
     }
+    function prefixReady(){ return /^XR\d{4}-$/.test(getSerialPrefix()); }
 
     // ====== SHARED COUNTER (GAS) ======
     async function apiGAS(body){
-      if(!GAS_URL || GAS_URL.includes('YOUR_WEB_APP_URL_HERE')) throw new Error('No GAS URL');
+      if(!GAS_URL) throw new Error('No GAS URL');
       const res = await fetch(GAS_URL, { method:'POST', headers:{ 'Content-Type':'text/plain;charset=utf-8' }, body: JSON.stringify(body) });
       if(!res.ok) throw new Error('GAS HTTP '+res.status);
       return await res.json();
@@ -375,6 +354,9 @@
     async function getInfoShared(prefix){ const data = await apiGAS({ action:'getInfo', prefix }); return data; }
 
     async function assignNextSerialSuffix(){
+      if (!prefixReady()){
+        alert('図番の先頭4桁が必要です（例: 3305）。図番を確認してください。'); return;
+      }
       const prefix = serverPrefix();
       try{
         const nxt = await getNextSuffixShared(prefix);
@@ -405,9 +387,7 @@
     }
     function heartbeatLock(prefix){
       if(__lockTimer) clearInterval(__lockTimer); if(!__lockId) return;
-      __lockTimer = setInterval(async()=>{
-        try{ await apiGAS({ action:'extendLock', lockId:__lockId, prefix, clientId:getClientId(), ttlSec:LOCK_TTL_SEC }); }catch(e){}
-      }, 60000);
+      __lockTimer = setInterval(async()=>{ try{ await apiGAS({ action:'extendLock', lockId:__lockId, prefix, clientId:getClientId(), ttlSec:LOCK_TTL_SEC }); }catch(e){} }, 60000);
     }
     async function releaseSharedLock(){
       if(!__lockId) return;
@@ -423,7 +403,7 @@
       return ok;
     }
 
-    // ====== PENAMAAN FILE (dengan waktu) ======
+    // ====== PENAMAAN FILE ======
     const sanitize = s => (s||'').replace(/[\\/:*?"<>|]/g,'').trim();
     function nowHHMM(){ const t=new Date(); return String(t.getHours()).padStart(2,'0')+String(t.getMinutes()).padStart(2,'0'); }
     function computeFilename(){
@@ -465,19 +445,32 @@
       const blobUrl = doc.output('bloburl'); window.open(blobUrl, '_blank');
     }
 
-    // ====== SAVE to NAS (duplicate guard by serial; zero-insensitive) ======
+    // ====== SAVE to NAS (folder picker + duplicate guard) ======
     const DB_NAME='form-folder-db', STORE='folders'; let __db; const FIXED_KEY='Okuma_MB80V_XR';
     function openDB(){ return new Promise((resolve,reject)=>{ const req=indexedDB.open(DB_NAME,1); req.onupgradeneeded=()=>req.result.createObjectStore(STORE); req.onsuccess=()=>{ __db=req.result; resolve(); }; req.onerror=()=>reject(req.error); });}
     async function openDBIfNeeded(){ if(!__db) await openDB(); }
     async function putHandle(key, handle){ await openDBIfNeeded(); return new Promise((res,rej)=>{ const tx=__db.transaction(STORE,'readwrite'); tx.objectStore(STORE).put(handle,key); tx.oncomplete=()=>res(); tx.onerror=()=>rej(tx.error); }); }
     async function getHandle(key){ await openDBIfNeeded(); return new Promise((res,rej)=>{ const tx=__db.transaction(STORE,'readonly'); const r=tx.objectStore(STORE).get(key); r.onsuccess=()=>res(r.result||null); r.onerror=()=>rej(r.error); }); }
     async function serialExists(dir, prefix, numeric){
-      if(!dir.entries) return false;
+      if(!dir?.entries) return false;
       const pattern = new RegExp(`_${prefix}0*${numeric}\\.pdf$`);
       for await (const [name] of dir.entries()){
         if(/\.pdf$/i.test(name) && pattern.test(name)) return name;
       }
       return false;
+    }
+    async function pickFolder(){
+      try{
+        const dir = await window.showDirectoryPicker({ mode:'readwrite' });
+        await navigator.storage?.persist?.();
+        await putHandle(FIXED_KEY, dir);
+        alert(`フォルダを設定しました（キー: ${FIXED_KEY}）`);
+      }catch(e){ console.warn('Folder pick cancelled/failed:', e); }
+    }
+    async function ensureDir(){
+      let dir = await getHandle(FIXED_KEY);
+      if (!dir) { await pickFolder(); dir = await getHandle(FIXED_KEY); }
+      return dir || null;
     }
 
     async function saveToNASFixed(){
@@ -487,12 +480,8 @@
       const fileName = computeFilename();
       if(!window.showDirectoryPicker){ const doc = await buildPdfDoc(); doc.save(fileName); return; }
       try{
-        let dir = await getHandle(FIXED_KEY);
-        if(!dir){
-          dir = await window.showDirectoryPicker({ mode:'readwrite' });
-          await navigator.storage?.persist?.();
-          await putHandle(FIXED_KEY, dir);
-        }
+        let dir = await ensureDir();
+        if(!dir){ const doc = await buildPdfDoc(); doc.save(fileName); return; }
         let perm = await dir.queryPermission?.({ mode:'readwrite' });
         if(perm!=='granted'){
           perm = await dir.requestPermission?.({ mode:'readwrite' });
@@ -536,7 +525,10 @@
       wireDateMirror(); wireEnterNavigationAll(); wireSerialMirror();
       setTodayIfEmpty('hakkohiduke'); applyPrefix();
       wireSoftRequired(); markSoftRequired();
-      document.querySelector('input[name="zuban"]').addEventListener('change', ()=>{ applyPrefix(); });
+      document.querySelector('input[name="zuban"]').addEventListener('change', async ()=>{
+        applyPrefix();
+        try{ const info = await getInfoShared(serverPrefix()); if (typeof info?.digits === 'number' && info.digits >= 1) PAD_DIGITS = info.digits; }catch(e){}
+      });
       try{
         const info = await getInfoShared(serverPrefix());
         if (typeof info?.digits === 'number' && info.digits >= 1) PAD_DIGITS = info.digits;
@@ -545,9 +537,40 @@
     });
     window.addEventListener('beforeunload', releaseSharedLock);
 
-    // dummy—placeholder untuk tombol yang ada di toolbar (agar tidak error jika belum dibuat)
-    function configureNextSerial(){ alert('未実装: 次番号設定'); }
-    function configureDigits(){ alert('未実装: 桁数設定'); }
+    // ====== Admin dialogs ======
+    async function configureNextSerial(){
+      if(!prefixReady()){ alert('図番の先頭4桁が必要です。'); return; }
+      const prefix = serverPrefix();
+      try{
+        const info = await getInfoShared(prefix);
+        const curNext = (typeof info?.next === 'number') ? info.next : null;
+        const digits  = (typeof info?.digits === 'number') ? info.digits : PAD_DIGITS;
+        const s = prompt(`対象プレフィックス: ${prefix}\n現在の桁数: ${digits}\n現在の次番号: ${curNext ?? '(不明)'}\n\n設定したい「次番号」を整数で入力してください`, curNext != null ? String(curNext) : '');
+        if (s == null) return;
+        const val = parseInt(String(s).replace(/[^\d]/g,''), 10);
+        if (!Number.isFinite(val) || val < 0) { alert('整数を入力してください'); return; }
+        await setNextSuffixShared(prefix, val);
+        setSerialSuffix(val);
+        alert(`設定しました。次番号: ${val}（桁=${digits}）`);
+      }catch(e){ alert('設定に失敗しました: ' + (e.message || e)); }
+    }
+    async function configureDigits(){
+      if(!prefixReady()){ alert('図番の先頭4桁が必要です。'); return; }
+      const prefix = serverPrefix();
+      try{
+        const info = await getInfoShared(prefix);
+        const cur = (typeof info?.digits === 'number') ? info.digits : PAD_DIGITS;
+        const s = prompt(`対象プレフィックス: ${prefix}\n新しい桁数（1〜8）を入力してください`, String(cur));
+        if (s == null) return;
+        const n = parseInt(String(s).replace(/[^\d]/g,''), 10);
+        if (!Number.isFinite(n) || n < 1 || n > 8) { alert('1〜8の整数で入力してください'); return; }
+        await setDigitsShared(prefix, n);
+        PAD_DIGITS = n;
+        const suffix = document.querySelector('input[name="serial_no_suffix"]')?.value || '';
+        if (suffix) setSerialSuffix(parseInt(suffix.replace(/^0+/,'') || '0', 10));
+        alert(`桁数を ${n} に設定しました。`);
+      }catch(e){ alert('設定に失敗しました: ' + (e.message || e)); }
+    }
   </script>
 </body>
 </html>
