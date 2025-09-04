@@ -231,14 +231,36 @@
 
     // ====== UTIL & UI ======
     function updateStampPreview(id, src) { document.getElementById(id).src = src || ''; }
+
+    // ✅ Keep 製造No (prefix & suffix) when clearing
     function clearAllFields() {
       const form = document.getElementById('inspection-form');
+      // -- capture current serial --
+      const prefixEl = document.querySelector('.serial-prefix');
+      const suffixEl = document.querySelector('input[name="serial_no_suffix"]');
+      const keepPrefix = prefixEl ? prefixEl.textContent : '';
+      const keepSuffix = suffixEl ? suffixEl.value : '';
+
       form.reset();
       ['stamp1','stamp2'].forEach(id => document.getElementById(id).src = '');
       form.querySelectorAll('.td-measure-grid input.invalid').forEach(el => el.classList.remove('invalid'));
-      wireDateMirror(); wireEnterNavigationAll(); wireSerialMirror();
-      wireSoftRequired(); markSoftRequired();
-      setTodayIfEmpty('hakkohiduke'); applyPrefix();
+
+      // -- rewire & defaults (but do NOT touch serial)
+      wireDateMirror();
+      wireEnterNavigationAll();
+      wireSerialMirror();
+      wireSoftRequired();
+      markSoftRequired();
+      setTodayIfEmpty('hakkohiduke');
+      // ⚠️ no applyPrefix() here, so prefix won't be recalculated from 図番
+
+      // -- restore serial exactly as before --
+      if (prefixEl) prefixEl.textContent = keepPrefix || prefixEl.textContent;
+      if (suffixEl) {
+        suffixEl.value = keepSuffix || suffixEl.value;
+        // update printed mirror
+        suffixEl.dispatchEvent(new Event('input', { bubbles:true }));
+      }
     }
 
     (function wireMeasureValidation() {
@@ -455,7 +477,7 @@
       if(!dir?.entries) return false;
       const pattern = new RegExp(`_${prefix}0*${numeric}\\.pdf$`);
       for await (const [name] of dir.entries()){
-        if(/\.pdf$/i.test(name) && pattern.test(name)) return name;
+        if(/\\.pdf$/i.test(name) && pattern.test(name)) return name;
       }
       return false;
     }
